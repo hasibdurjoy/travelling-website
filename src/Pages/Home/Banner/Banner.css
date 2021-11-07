@@ -1,0 +1,15 @@
+.banner-container{
+    background-image: url('https://www.workaway.info/gfx/2015/content/frontpage/header_frontpage_5.jpg');
+    background-size: cover;
+    width: 100%;
+    height: 80vh;
+    align-items: center;
+    justify-content: center;
+}
+.banner-title{
+    font-size: 100px;
+    color: white;
+}
+.search-button{
+    background-color: #ea5318;
+}

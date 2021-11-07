@@ -1,0 +1,7 @@
+.package-card{
+    border-radius: 20px;
+    background: linear-gradient(180deg, hsla(0, 0%, 100%, 1) 0%, hsla(198, 54%, 88%, 1) 100%);
+}
+.package-card img{
+    border-radius: 20px;
+}
