@@ -4,8 +4,11 @@ import { Link } from 'react-router-dom';
 import { useHistory, useLocation } from 'react-router';
 import { useForm } from 'react-hook-form';
 import useAuth from '../../../Hooks/useAuth';
+import Swal from 'sweetalert2';
+
 
 const Register = () => {
+    const [loggedIn, setLoggedIn] = useState(false);
     const { signInUsingGoogle, signInUsingGithub, registerWithEmailPassword } = useAuth();
     const { register, handleSubmit, formState: { errors } } = useForm();
 
@@ -20,20 +23,39 @@ const Register = () => {
             setError('password must be 6 characters');
             return;
         }
-        if (data.password!==data.confirmPassword) {
+        if (data.password !== data.confirmPassword) {
             setError('please match both password');
             return;
         }
         else {
-            registerWithEmailPassword(data.name, data.email, data.password, redirect_url, history);
+            registerWithEmailPassword(data.name, data.email, data.password, redirect_url, history, setLoggedIn);
         }
     };
 
     const logInWithGoogle = () => {
-        signInUsingGoogle(redirect_url, history);
+        signInUsingGoogle(redirect_url, history, setLoggedIn);
     }
     const logInWithGithub = () => {
-        signInUsingGithub(redirect_url, history);
+        signInUsingGithub(redirect_url, history, setLoggedIn);
+    }
+
+
+    {
+        const Toast = Swal.mixin({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+                toast.addEventListener('mouseenter', Swal.stopTimer)
+                toast.addEventListener('mouseleave', Swal.resumeTimer)
+            }
+        })
+        loggedIn && Toast.fire({
+            icon: 'success',
+            title: 'Registered successfully'
+        })
     }
 
     return (
@@ -46,12 +68,12 @@ const Register = () => {
                         {errors.name && <small className="text-danger text-start">Enter your name</small>}
 
                         <input  {...register("email", { required: true })} type="email" className="mt-3 p-2 rounded border-1 w-100" placeholder="email address" /> <br />
-                        {errors.email &&  <small className="text-danger text-start">Enter your email</small>}
+                        {errors.email && <small className="text-danger text-start">Enter your email</small>}
 
 
                         <input  {...register("password", { required: true })} type="password" className="mt-3 p-2 rounded border-1 w-100" placeholder="password " /> <br />
                         {errors.password && <>  <small className="text-danger text-start">Enter a password</small></>}
-                        {errors.password && <br/>}
+                        {errors.password && <br />}
                         <small className="text-danger text-start">{error}</small>
 
                         <input  {...register("confirmPassword", { required: true })} type="password" className="mt-3 p-2 rounded border-1 w-100" placeholder="Confirm password " /> <br />

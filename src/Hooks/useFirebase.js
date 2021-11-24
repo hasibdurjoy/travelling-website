@@ -24,12 +24,14 @@ const useFirebase = () => {
 
     const auth = getAuth();
 
-    const registerWithEmailPassword = (name, email, password, redirect_url, history) => {
+    const registerWithEmailPassword = (name, email, password, redirect_url, history, setLoggedIn) => {
         console.log(email, password);
+        setLoggedIn(false);
         createUserWithEmailAndPassword(auth, email, password)
             .then((result) => {
                 updateProfile(auth.currentUser, { displayName: name })
                     .then(() => {
+                        setLoggedIn(true)
                         history.push(redirect_url);
                         window.location.reload();
                     })
@@ -40,9 +42,10 @@ const useFirebase = () => {
             });
     }
 
-    const logInWithEmailPassword = (email, password, redirect_url, history) => {
+    const logInWithEmailPassword = (email, password, redirect_url, history, setLoggedIn) => {
         signInWithEmailAndPassword(auth, email, password)
             .then(result => {
+                setLoggedIn(true);
                 const user = result.user;
                 history.push(redirect_url);
                 setError('')
@@ -53,10 +56,11 @@ const useFirebase = () => {
             })
     }
 
-    const signInUsingGoogle = (redirect_url, history) => {
+    const signInUsingGoogle = (redirect_url, history, setLoggedIn) => {
         const googleProvider = new GoogleAuthProvider();
         signInWithPopup(auth, googleProvider)
             .then(result => {
+                setLoggedIn(true);
                 setUser(result.user)
                 history.push(redirect_url);
             })

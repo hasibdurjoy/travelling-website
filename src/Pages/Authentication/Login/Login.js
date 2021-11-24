@@ -1,12 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useHistory, useLocation } from 'react-router';
 import { Card } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import useAuth from '../../../Hooks/useAuth';
-
+import Swal from 'sweetalert2';
 
 const Login = () => {
+    const [loggedIn, setLoggedIn] = useState(false);
     const history = useHistory();
     const location = useLocation();
     const redirect_url = location.state?.from || "/home";
@@ -18,7 +19,7 @@ const Login = () => {
 
     const onSubmit = data => {
 
-        logInWithEmailPassword(data.email, data.password, redirect_url, history);
+        logInWithEmailPassword(data.email, data.password, redirect_url, history, setLoggedIn);
 
     };
 
@@ -27,11 +28,30 @@ const Login = () => {
     }
 
     const logInWithGoogle = () => {
-        signInUsingGoogle(redirect_url, history);
+        signInUsingGoogle(redirect_url, history, setLoggedIn);
     }
     const logInWithGithub = () => {
-        signInUsingGithub(redirect_url, history);
+        signInUsingGithub(redirect_url, history, setLoggedIn);
     }
+
+    {
+        const Toast = Swal.mixin({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+                toast.addEventListener('mouseenter', Swal.stopTimer)
+                toast.addEventListener('mouseleave', Swal.resumeTimer)
+            }
+        })
+        loggedIn && Toast.fire({
+            icon: 'success',
+            title: 'Logged in successfully'
+        })
+    }
+
 
     return (
         <div className="d-flex flex-column align-items-center justify-content-center  p-5 log-in">
