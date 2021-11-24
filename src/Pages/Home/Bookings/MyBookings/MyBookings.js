@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Container, Row } from 'react-bootstrap';
 import useAuth from '../../../../Hooks/useAuth';
 import MyBooking from '../MyBooking/MyBooking';
+import Swal from 'sweetalert2';
+
 
 const MyBookings = () => {
     const { user } = useAuth();
@@ -13,21 +15,35 @@ const MyBookings = () => {
     }, []);
 
     const handleDeleteBooking = (id) => {
-        const proceed = window.confirm('Are you sure, you want to cancel?');
-        if (proceed) {
-            const url = `https://peaceful-wave-84930.herokuapp.com/bookings/${id}`;
-            fetch(url, {
-                method: 'DELETE'
-            })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.deletedCount > 0) {
-                        alert('deleted successfully');
-                        const remainingBookings = bookings.filter(booking => booking._id !== id);
-                        setBookings(remainingBookings);
-                    }
-                });
-        }
+        Swal.fire({
+            icon: 'question',
+            title: 'Cancel Booking',
+            showDenyButton: true, showCancelButton: true,
+            confirmButtonText: `Yes`,
+            denyButtonText: `No`,
+        })
+            .then((result) => {
+                if (result.isConfirmed) {
+                    const url = `https://peaceful-wave-84930.herokuapp.com/bookings/${id}`;
+                    fetch(url, {
+                        method: 'DELETE'
+                    })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.deletedCount > 0) {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Deleted Successfully',
+                                })
+                                const remainingBookings = bookings.filter(booking => booking._id !== id);
+                                setBookings(remainingBookings);
+                            }
+                        });
+                }
+                else if (result.isDenied) {
+                    Swal.fire('Changes are not saved', '', 'info')
+                }
+            });
     }
     return (
         <Container className="my-4">

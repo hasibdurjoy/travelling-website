@@ -3,6 +3,7 @@ import { Card } from 'react-bootstrap';
 import { useHistory } from 'react-router';
 import { useForm } from 'react-hook-form';
 import useAuth from '../../../../Hooks/useAuth';
+import Swal from 'sweetalert2';
 
 const BookingForm = ({ event }) => {
 
@@ -16,21 +17,40 @@ const BookingForm = ({ event }) => {
         data.bookingDate = current_date;
         data.bookingTime = current_time;
         data.status = "pending";
-        fetch('https://peaceful-wave-84930.herokuapp.com/bookings', {
-            method: "POST",
-            headers: {
-                'content-type': 'application/json'
-            },
-            body: JSON.stringify(data)
+
+        Swal.fire({
+            icon: 'question',
+            title: 'Are you sure you are booking this?',
+            showDenyButton: true, showCancelButton: true,
+            confirmButtonText: `Yes`,
+            denyButtonText: `No`,
         })
-            .then(res => res.json())
-            .then(result => {
-                if (result.insertedId) {
-                    alert('successfully added');
-                    reset();
-                    history.push('/');
+            .then((result) => {
+                if (result.isConfirmed) {
+                    fetch('https://peaceful-wave-84930.herokuapp.com/bookings', {
+                        method: "POST",
+                        headers: {
+                            'content-type': 'application/json'
+                        },
+                        body: JSON.stringify(data)
+                    })
+                        .then(res => res.json())
+                        .then(result => {
+                            if (result.insertedId) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Booked Successfully',
+                                })
+                                reset();
+                                history.push('/');
+                            }
+                        })
                 }
-            })
+                else if (result.isDenied) {
+                    Swal.fire('Changes are not saved', '', 'info')
+                }
+            });
+
     }
 
     //set booking date and time to insert database automatically
