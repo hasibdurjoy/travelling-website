@@ -3,56 +3,87 @@ import React, { useEffect, useState } from 'react';
 import { Container, Modal, Row, Table } from 'react-bootstrap';
 import ManageBooking from '../ManageBooking/ManageBooking';
 import './ManageBooking.css';
+import Swal from 'sweetalert2';
+
 
 const ManageBookings = () => {
     const [bookings, setBookings] = useState([]);
-    const [updateBooking, setUpdateBooking] = useState({});
+    const [updateBooking, setUpdateBooking] = useState(false);
 
     //delete bookings
     useEffect(() => {
         fetch('https://peaceful-wave-84930.herokuapp.com/bookings')
             .then(res => res.json())
             .then(data => setBookings(data))
-    }, [])
+    }, [updateBooking])
 
     const handleDeleteBooking = (id) => {
-        const proceed = window.confirm('Are you sure, you want to cancel?');
-        if (proceed) {
-            const url = `https://peaceful-wave-84930.herokuapp.com/bookings/${id}`;
-            fetch(url, {
-                method: 'DELETE'
-            })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.deletedCount > 0) {
-                        alert('deleted successfully');
-                        const remainingBookings = bookings.filter(booking => booking._id !== id);
-                        setBookings(remainingBookings);
-                    }
-                });
-        }
+        Swal.fire({
+            icon: 'question',
+            title: 'Delete Bookings',
+            showDenyButton: true, showCancelButton: true,
+            confirmButtonText: `Yes`,
+            denyButtonText: `No`,
+        })
+            .then((result) => {
+                if (result.isConfirmed) {
+                    const url = `https://peaceful-wave-84930.herokuapp.com/bookings/${id}`;
+                    fetch(url, {
+                        method: 'DELETE'
+                    })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.deletedCount > 0) {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Deleted Successfully',
+                                })
+                                const remainingBookings = bookings.filter(booking => booking._id !== id);
+                                setBookings(remainingBookings);
+                            }
+                        });
+                }
+                else if (result.isDenied) {
+                    Swal.fire('Changes are not saved', '', 'info')
+                }
+            });
     }
 
 
     const handleUpdateBooking = (userId, bookingId) => {
-        const proceed = window.confirm('Are you want to approve this booking??');
-        if (proceed) {
-            const url = `https://peaceful-wave-84930.herokuapp.com/bookings/${bookingId}`;
-            fetch(url, {
-                method: 'PUT',
-                headers: {
-                    'content-type': 'application/json'
-                },
-                body: JSON.stringify(updateBooking)
-            })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.modifiedCount > 0) {
-                        alert('Approved Successful');
-                        window.location.reload();
-                    }
-                })
-        }
+        setUpdateBooking(false);
+        Swal.fire({
+            icon: 'question',
+            title: 'Update Bookings',
+            showDenyButton: true, showCancelButton: true,
+            confirmButtonText: `Yes`,
+            denyButtonText: `No`,
+        })
+            .then((result) => {
+                if (result.isConfirmed) {
+                    const url = `https://peaceful-wave-84930.herokuapp.com/bookings/${bookingId}`;
+                    fetch(url, {
+                        method: 'PUT',
+                        headers: {
+                            'content-type': 'application/json'
+                        }
+                    })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.modifiedCount > 0) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Updated Successfully',
+                                })
+                                setUpdateBooking(true);
+                            }
+                        });
+                }
+                else if (result.isDenied) {
+                    Swal.fire('Changes are not saved', '', 'info')
+                }
+            });
+
     }
 
     return (
