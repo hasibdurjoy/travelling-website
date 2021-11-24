@@ -18,7 +18,7 @@ const ManageBooking = ({ booking, handleDeleteBooking, handleUpdateBooking }) =>
             <td>
                 <div className="d-flex justify-content-around pt-2">
                     <button onClick={() => { handleDeleteBooking(_id) }} className="btn btn-danger rounded-pill">Cancel</button>
-                    <button onClick={() => { handleUpdateBooking(user.uid, _id) }} className="btn btn-success rounded-pill">Approve</button>
+                    <button disabled={status === 'booked'} onClick={() => { handleUpdateBooking(user.uid, _id) }} className="btn btn-success rounded-pill">Approve</button>
                 </div>
             </td>
         </tr>
