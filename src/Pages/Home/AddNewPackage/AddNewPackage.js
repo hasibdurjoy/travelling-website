@@ -1,24 +1,42 @@
 import React from 'react';
 import { Card } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
+import Swal from 'sweetalert2';
 
 const AddNewPackage = () => {
     const { register, handleSubmit, reset, formState: { errors } } = useForm();
     const onSubmit = data => {
-        fetch('https://peaceful-wave-84930.herokuapp.com/packages', {
-            method: "POST",
-            headers: {
-                'content-type': 'application/json'
-            },
-            body: JSON.stringify(data)
+        Swal.fire({
+            icon: 'question',
+            title: 'Add new package',
+            showDenyButton: true, showCancelButton: true,
+            confirmButtonText: `Yes`,
+            denyButtonText: `No`,
         })
-            .then(res => res.json())
-            .then(result => {
-                if (result.insertedId) {
-                    alert('successfully added');
-                    reset();
+            .then((result) => {
+                if (result.isConfirmed) {
+                    fetch('https://peaceful-wave-84930.herokuapp.com/packages', {
+                        method: "POST",
+                        headers: {
+                            'content-type': 'application/json'
+                        },
+                        body: JSON.stringify(data)
+                    })
+                        .then(res => res.json())
+                        .then(result => {
+                            if (result.insertedId) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Added Successfully',
+                                })
+                                reset();
+                            }
+                        })
                 }
-            })
+                else if (result.isDenied) {
+                    Swal.fire('Changes are not saved', '', 'info')
+                }
+            });
     }
     return (
         <Card className="border-0 shadow px-2 rounded mx-auto mt-3">

@@ -1,11 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Container, Nav, Navbar } from 'react-bootstrap';
 import { Link, NavLink } from 'react-router-dom';
 import useAuth from '../../../Hooks/useAuth';
 import { useHistory } from 'react-router';
 import './Header.css';
+import Swal from 'sweetalert2';
+
 
 const Header = () => {
+    const [loggedOut, setLoggedOut] = useState(false);
+
     const { user, logOut } = useAuth();
     const linkStyle = {
         fontWeight: "bold",
@@ -16,6 +20,30 @@ const Header = () => {
     const handleClick = path => {
         history.push(path);
     }
+
+    const handleLogOut = () => {
+        logOut();
+        setLoggedOut(true);
+    }
+
+    {
+        const Toast = Swal.mixin({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+                toast.addEventListener('mouseenter', Swal.stopTimer)
+                toast.addEventListener('mouseleave', Swal.resumeTimer)
+            }
+        })
+        loggedOut && Toast.fire({
+            icon: 'error',
+            title: 'logged out'
+        })
+    }
+
     return (
         <Navbar className="header-container" collapseOnSelect expand="lg" variant="dark" bg="dark">
             <Container>
@@ -42,7 +70,7 @@ const Header = () => {
                                 <Nav.Link as={NavLink} to="/addPackage" activeStyle={linkStyle} className="header-link">Add New Package</Nav.Link>
                                 <Nav.Link as={NavLink} to="/manageBookings" activeStyle={linkStyle} className="header-link">Manage Bookings</Nav.Link>
                                 <Nav.Link className="ms-3">{user.displayName}</Nav.Link>
-                                <button onClick={logOut} className="btn btn-danger rounded-pill mx-2">Log out</button>
+                                <button onClick={handleLogOut} className="btn btn-danger rounded-pill mx-2">Log out</button>
                             </>
                                 :
                                 <>

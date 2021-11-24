@@ -67,10 +67,11 @@ const useFirebase = () => {
             .finally(() => { setIsLoading(false) })
     }
 
-    const signInUsingGithub = (redirect_url, history) => {
+    const signInUsingGithub = (redirect_url, history, setLoggedIn) => {
         const githubProvider = new GithubAuthProvider();
         signInWithPopup(auth, githubProvider)
             .then(result => {
+                setLoggedIn(true)
                 setUser(result.user)
                 history.push(redirect_url);
             })
